@@ -64,7 +64,7 @@ Through the analysis of diagnostic data, I gained valuable insights into substit
 
 These metrics demonstrated that store owners are highly receptive to adapting their inventory if the alternative is presented seamlessly and is backed by the right incentives. 🤝 This reinforced the idea that well-implemented technology can effectively bridge the gap between logistical constraints and continuous customer satisfaction. ✅
 
-##Images
+## Images
 
 ![Login de ArcaSin](login.png)
 
