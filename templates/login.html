@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - ArcaSin</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/arca.ico">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="/static/css/login.css">
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Main Container -->
+    <main class="login-container">
+        <!-- 1. LOGIN CARD -->
+        <section class="login-card" id="loginCard">
+            <!-- Header/Logo Area -->
+            <div class="login-header">
+                <div class="brand-logo">
+                    <img src="/arca.png" alt="Arca Continental Logo" style="max-height: 55px; width: auto; object-fit: contain;">
+                </div>
+                <h1>ArcaSin</h1>
+                <p class="subtitle">Ingresa tus credenciales (Cód. Cliente, admin o operador)</p>
+            </div>
+
+            <!-- Form -->
+            <form id="loginForm" class="login-form" novalidate>
+                <!-- Username Field -->
+                <div class="input-group">
+                    <label for="username" class="input-label">Usuario o Código de Cliente</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="far fa-user"></i></span>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            placeholder="Ej: 8927240000000 o admin" 
+                            required 
+                            autocomplete="username"
+                        >
+                    </div>
+                    <span class="error-message" id="usernameError">Por favor ingresa tu usuario o código de cliente.</span>
+                </div>
+
+                <!-- Password Field -->
+                <div class="input-group">
+                    <div class="label-row">
+                        <label for="password" class="input-label">Contraseña</label>
+                        <a href="#" class="forgot-password-link" id="toForgotPassword">¿Olvidaste tu contraseña?</a>
+                    </div>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="fas fa-lock"></i></span>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            placeholder="••••••••" 
+                            required 
+                            autocomplete="current-password"
+                        >
+                        <button type="button" class="toggle-password" id="togglePassword" aria-label="Mostrar contraseña">
+                            <i class="far fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                    <span class="error-message" id="passwordError">Por favor ingresa tu contraseña.</span>
+                </div>
+
+                <!-- Remember Me -->
+                <div class="form-options">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="rememberMe">
+                        <span class="checkmark"></span>
+                        <span class="checkbox-text">Recordar mi sesión</span>
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span class="btn-text">Iniciar Sesión</span>
+                    <span class="btn-loader hidden"><i class="fas fa-circle-notch fa-spin"></i></span>
+                </button>
+            </form>
+            <!-- Footer Link -->
+            <div class="login-footer">
+                <p>¿No tienes una cuenta? <a href="#" class="signup-link" id="toRegister">Regístrate</a></p>
+            </div>
+        </section>
+
+        <!-- 2. REGISTER CARD -->
+        <section class="login-card hidden" id="registerCard">
+            <div class="login-header">
+                <div class="brand-logo">
+                    <img src="/arca.png" alt="Arca Continental Logo" style="max-height: 55px; width: auto; object-fit: contain;">
+                </div>
+                <h1>Crear una Cuenta</h1>
+                <p class="subtitle">Regístrate para acceder al panel de ArcaSin</p>
+            </div>
+
+            <form id="registerForm" class="login-form" novalidate>
+                <!-- Username Field -->
+                <div class="input-group">
+                    <label for="regUsername" class="input-label">Usuario o ID de Cliente</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="far fa-user"></i></span>
+                        <input 
+                            type="text" 
+                            id="regUsername" 
+                            name="username" 
+                            placeholder="Ej: 8927240000000 o mi_usuario" 
+                            required
+                        >
+                    </div>
+                    <span class="error-message" id="regUsernameError">Por favor ingresa un usuario o ID.</span>
+                </div>
+
+                <!-- Password Field -->
+                <div class="input-group">
+                    <label for="regPassword" class="input-label">Contraseña</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="fas fa-lock"></i></span>
+                        <input 
+                            type="password" 
+                            id="regPassword" 
+                            name="password" 
+                            placeholder="Mínimo 6 caracteres" 
+                            required
+                        >
+                        <button type="button" class="toggle-password" id="toggleRegPassword" aria-label="Mostrar contraseña">
+                            <i class="far fa-eye" id="eyeIconReg"></i>
+                        </button>
+                    </div>
+                    <span class="error-message" id="regPasswordError">Por favor ingresa una contraseña (mín. 6 caracteres).</span>
+                </div>
+
+                <!-- Role Field -->
+                <div class="input-group">
+                    <label for="regRole" class="input-label">Rol del Usuario</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="fas fa-user-tag"></i></span>
+                        <select id="regRole" name="role" class="form-control-select" style="width: 100%; padding: 1rem 1.25rem 1rem 3rem; background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border); border-radius: 12px; outline: none; font-family: inherit; font-size: 0.95rem; appearance: none; transition: all var(--transition-normal);">
+                            <option value="tendero">Tendero / Cliente</option>
+                            <option value="operator">Operador de CEDI / Ruta</option>
+                            <option value="admin">Administrador AC</option>
+                        </select>
+                        <span style="position: absolute; right: 1.25rem; pointer-events: none; color: var(--text-muted);"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn" id="regSubmitBtn">
+                    <span class="btn-text">Registrarse</span>
+                    <span class="btn-loader hidden"><i class="fas fa-circle-notch fa-spin"></i></span>
+                </button>
+            </form>
+
+            <!-- Footer Link -->
+            <div class="login-footer">
+                <p>¿Ya tienes una cuenta? <a href="#" class="signup-link to-login-btn">Inicia Sesión</a></p>
+            </div>
+        </section>
+
+        <!-- 3. FORGOT PASSWORD CARD -->
+        <section class="login-card hidden" id="forgotPasswordCard">
+            <div class="login-header">
+                <div class="brand-logo">
+                    <img src="/arca.png" alt="Arca Continental Logo" style="max-height: 55px; width: auto; object-fit: contain;">
+                </div>
+                <h1>¿Olvidaste tu contraseña?</h1>
+                <p class="subtitle">Ingresa tu usuario y tu correo para recuperar el acceso</p>
+            </div>
+
+            <form id="forgotForm" class="login-form" novalidate>
+                <!-- Username Field -->
+                <div class="input-group">
+                    <label for="forgotUsername" class="input-label">Usuario o ID de Cliente</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="far fa-user"></i></span>
+                        <input 
+                            type="text" 
+                            id="forgotUsername" 
+                            name="username" 
+                            placeholder="Ej: 8927240000000 o admin" 
+                            required
+                        >
+                    </div>
+                    <span class="error-message" id="forgotUsernameError">Por favor ingresa tu usuario o ID de cliente.</span>
+                </div>
+
+                <!-- Email Field -->
+                <div class="input-group">
+                    <label for="forgotEmail" class="input-label">Correo Electrónico</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="far fa-envelope"></i></span>
+                        <input 
+                            type="email" 
+                            id="forgotEmail" 
+                            name="email" 
+                            placeholder="ejemplo@correo.com" 
+                            required
+                        >
+                    </div>
+                    <span class="error-message" id="forgotEmailError">Por favor ingresa un correo válido.</span>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn" id="forgotSubmitBtn">
+                    <span class="btn-text">Enviar Enlace de Recuperación</span>
+                    <span class="btn-loader hidden"><i class="fas fa-circle-notch fa-spin"></i></span>
+                </button>
+            </form>
+
+            <!-- Footer Link -->
+            <div class="login-footer">
+                <p>Regresar al <a href="#" class="signup-link to-login-btn">Inicio de Sesión</a></p>
+            </div>
+        </section>
+
+        <!-- 4. RESET PASSWORD CARD -->
+        <section class="login-card hidden" id="resetPasswordCard">
+            <div class="login-header">
+                <div class="brand-logo">
+                    <img src="/arca.png" alt="Arca Continental Logo" style="max-height: 55px; width: auto; object-fit: contain;">
+                </div>
+                <h1>Restablecer Contraseña</h1>
+                <p class="subtitle">Escribe tu nueva contraseña para el usuario: <strong id="resetTargetUser">...</strong></p>
+            </div>
+
+            <form id="resetForm" class="login-form" novalidate>
+                <!-- Password Field -->
+                <div class="input-group">
+                    <label for="resetPassword" class="input-label">Nueva Contraseña</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="fas fa-lock"></i></span>
+                        <input 
+                            type="password" 
+                            id="resetPassword" 
+                            name="password" 
+                            placeholder="Mínimo 6 caracteres" 
+                            required
+                        >
+                        <button type="button" class="toggle-password" id="toggleResetPassword" aria-label="Mostrar contraseña">
+                            <i class="far fa-eye" id="eyeIconReset"></i>
+                        </button>
+                    </div>
+                    <span class="error-message" id="resetPasswordError">Por favor ingresa una contraseña (mín. 6 caracteres).</span>
+                </div>
+
+                <!-- Confirm Password Field -->
+                <div class="input-group">
+                    <label for="resetConfirmPassword" class="input-label">Confirmar Contraseña</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="fas fa-lock"></i></span>
+                        <input 
+                            type="password" 
+                            id="resetConfirmPassword" 
+                            name="confirmPassword" 
+                            placeholder="Repite la contraseña" 
+                            required
+                        >
+                    </div>
+                    <span class="error-message" id="resetConfirmPasswordError">Las contraseñas no coinciden o no son válidas.</span>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn" id="resetSubmitBtn">
+                    <span class="btn-text">Restablecer Contraseña</span>
+                    <span class="btn-loader hidden"><i class="fas fa-circle-notch fa-spin"></i></span>
+                </button>
+            </form>
+
+            <!-- Footer Link -->
+            <div class="login-footer">
+                <p>Regresar al <a href="#" class="signup-link to-login-btn">Inicio de Sesión</a></p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden">
+        <div class="toast-content">
+            <span class="toast-icon" id="toastIcon"><i class="fas fa-info-circle"></i></span>
+            <div class="toast-message">
+                <h4 id="toastTitle">Notificación</h4>
+                <p id="toastBody">Mensaje de prueba</p>
+            </div>
+        </div>
+        <button class="toast-close" id="toastClose" aria-label="Cerrar"><i class="fas fa-times"></i></button>
+    </div>
+
+    <!-- Script -->
+    <script src="/static/js/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArcaSin - Arca Continental</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/arca.ico">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Chart.js for Admin Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Canvas Confetti for Reward Animations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+    <div class="app-layout">
+        <!-- ================= SIDEBAR ================= -->
+        <aside class="sidebar">
+            <div class="brand-container">
+                <h1 class="brand-title">Arca Continental</h1>
+                <span class="brand-badge">ArcaSin</span>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="login-box">
+                    <span class="login-label">👤 Usuario Activo:</span>
+                    <div id="logged-user-name" style="font-weight: 700; color: white; margin-bottom: 6px; font-size: 0.95rem;">Cargando...</div>
+                    <span id="logged-user-role" class="badge-red" style="font-size: 0.68rem; margin-bottom: 12px;">Cargando...</span>
+                    <button id="btn-logout" class="btn-secondary" style="margin-top: 15px; border-color: rgba(230,0,0,0.3); color: #FFA6A6;">🚪 Cerrar Sesión</button>
+                </div>
+                
+                <div class="db-status-box">
+                    <h3 class="db-status-title">Conexión a Datos</h3>
+                    <ul class="db-status-list">
+                        <li><span class="status-indicator active"></span> Orders.csv (GMV $142M)</li>
+                        <li><span class="status-indicator active"></span> OrderDetails.csv</li>
+                        <li><span class="status-indicator active"></span> Resultados.csv</li>
+                        <li><span class="status-indicator active"></span> Incidencias.csv</li>
+                        <li><span class="status-indicator active"></span> Aceptaciones.csv</li>
+                    </ul>
+                </div>
+
+                <div class="dev-tools-box">
+                    <button id="btn-reset-db" class="btn-secondary">🔄 Reiniciar Simulación (Limpiar CSV)</button>
+                </div>
+            </nav>
+            
+            <footer class="sidebar-footer">
+                <p>© 2026 Arca Continental. Todos los derechos reservados.</p>
+            </footer>
+        </aside>
+
+        <!-- ================= MAIN WORKSPACE ================= -->
+        <main class="main-content">
+            
+            <!-- ================ ROLE 1: TENDERO ================ -->
+            <section id="view-tendero" class="role-view">
+                <header class="view-header">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                        <div>
+                            <h2>Portal de Tienda: Rescate de Pedidos</h2>
+                            <p>Valida tus órdenes en tiempo real y gestiona incidencias de entrega</p>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span style="font-weight: 700; color: var(--text-primary); background-color: white; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.9rem;">
+                                    🏪 <span id="tendero-welcome">Abarrotes "La Bendición"</span>
+                                </span>
+                                <span class="badge-points">🪙 <span id="tendero-points">350</span> pts</span>
+                            </div>
+                            <div id="urgency-warning-header" class="urgency-warning" style="font-size: 0.78rem; font-weight: 700; color: #E60000; display: flex; align-items: center; gap: 4px;">
+                                ⏳ ¡Tus retos y puntos acumulados expiran en <span class="live-countdown" style="font-family: monospace; font-weight: 800; background-color: rgba(230,0,0,0.1); padding: 2px 6px; border-radius: 4px;">48:00:00</span>!
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="workspace-tabs">
+                    <button class="op-tab-btn active" onclick="switchMobileTab('chat')">💬 Asistente Virtual</button>
+                    <button class="op-tab-btn" onclick="switchMobileTab('incidencias')">📦 Incidencias Express</button>
+                    <button class="op-tab-btn" onclick="switchMobileTab('premios')">🎁 Premios Coleccionables</button>
+                    <button class="op-tab-btn" onclick="switchMobileTab('fichitas')">🔴 Fichitas Digitales</button>
+                    <button class="op-tab-btn" onclick="switchMobileTab('diagnostico')">📊 Diagnóstico de Surtido</button>
+                    <button class="op-tab-btn" onclick="switchMobileTab('soporte')">💬 Soporte y Legal</button>
+                </div>
+
+                <div class="operator-tab-content">
+                    <!-- Tab 1: Chat assistant & Multiproduct Shopping Cart -->
+                    <div id="m-tab-chat" class="mobile-tab-pane active">
+                        <div class="tendero-grid">
+                            
+                            <!-- Left Area: Products Grid and Virtual Assistant -->
+                            <div style="display: flex; flex-direction: column; gap: 20px;">
+                                
+                                <!-- Products Grid Card -->
+                                <div class="card" style="margin: 0;">
+                                    <h3 style="margin-bottom: 5px;">🛍️ Mis Productos Más Vendidos</h3>
+                                    <p class="card-subtitle" style="margin-bottom: 20px;">Agrega piezas de tus productos más vendidos directamente a tu orden.</p>
+                                    
+                                    <div class="product-grid">
+                                        <!-- Card 1: Coca-Cola Original -->
+                                        <div class="product-card">
+                                            <div class="product-image-container">
+                                                <img src="/static/refrescos/coca_original.jpeg" alt="Coca-Cola Original" onerror="handleImageError(this, '🥤')">
+                                            </div>
+                                            <div class="product-title">Coca-Cola Original (600ml)</div>
+                                            <div class="product-price">$17.00 MXN</div>
+                                            <div class="qty-selector">
+                                                <button class="qty-btn" onclick="changeProductQty('coke_orig', -1)">-</button>
+                                                <input type="text" id="qty-coke_orig" class="qty-input" value="0">
+                                                <button class="qty-btn" onclick="changeProductQty('coke_orig', 1)">+</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card 2: Coca-Cola Sin Azúcar -->
+                                        <div class="product-card">
+                                            <div class="product-image-container">
+                                                <img src="/static/refrescos/coca_zero.jpeg" alt="Coca-Cola Sin Azúcar" onerror="handleImageError(this, '🔴')">
+                                            </div>
+                                            <div class="product-title">Coca-Cola Sin Azúcar (600ml)</div>
+                                            <div class="product-price">$16.00 MXN</div>
+                                            <div class="qty-selector">
+                                                <button class="qty-btn" onclick="changeProductQty('coke_zero', -1)">-</button>
+                                                <input type="text" id="qty-coke_zero" class="qty-input" value="0">
+                                                <button class="qty-btn" onclick="changeProductQty('coke_zero', 1)">+</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card 3: Sprite Limón-Lima -->
+                                        <div class="product-card">
+                                            <div class="product-image-container">
+                                                <img src="/static/refrescos/sprite.jpeg" alt="Sprite Limón-Lima" onerror="handleImageError(this, '🍋')">
+                                            </div>
+                                            <div class="product-title">Sprite Limón-Lima (600ml)</div>
+                                            <div class="product-price">$16.00 MXN</div>
+                                            <div class="qty-selector">
+                                                <button class="qty-btn" onclick="changeProductQty('sprite', -1)">-</button>
+                                                <input type="text" id="qty-sprite" class="qty-input" value="0">
+                                                <button class="qty-btn" onclick="changeProductQty('sprite', 1)">+</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card 4: Fanta Naranja -->
+                                        <div class="product-card">
+                                            <div class="product-image-container">
+                                                <img src="/static/refrescos/fanta_naranja.jpeg" alt="Fanta Naranja" onerror="handleImageError(this, '🍊')">
+                                            </div>
+                                            <div class="product-title">Fanta Naranja (600ml)</div>
+                                            <div class="product-price">$16.00 MXN</div>
+                                            <div class="qty-selector">
+                                                <button class="qty-btn" onclick="changeProductQty('fanta_orange', -1)">-</button>
+                                                <input type="text" id="qty-fanta_orange" class="qty-input" value="0">
+                                                <button class="qty-btn" onclick="changeProductQty('fanta_orange', 1)">+</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card 5: Fanta Uva -->
+                                        <div class="product-card">
+                                            <div class="product-image-container">
+                                                <img src="/static/refrescos/fanta_uva.jpeg" alt="Fanta Uva" onerror="handleImageError(this, '🍇')">
+                                            </div>
+                                            <div class="product-title">Fanta Uva (600ml)</div>
+                                            <div class="product-price">$16.00 MXN</div>
+                                            <div class="qty-selector">
+                                                <button class="qty-btn" onclick="changeProductQty('fanta_grape', -1)">-</button>
+                                                <input type="text" id="qty-fanta_grape" class="qty-input" value="0">
+                                                <button class="qty-btn" onclick="changeProductQty('fanta_grape', 1)">+</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card 6: Agua Ciel Purificada -->
+                                        <div class="product-card">
+                                            <div class="product-image-container">
+                                                <img src="/static/refrescos/agua_ciel.jpeg" alt="Agua Ciel Purificada" onerror="handleImageError(this, '💧')">
+                                            </div>
+                                            <div class="product-title">Agua Ciel Purificada (1L)</div>
+                                            <div class="product-price">$14.00 MXN</div>
+                                            <div class="qty-selector">
+                                                <button class="qty-btn" onclick="changeProductQty('ciel', -1)">-</button>
+                                                <input type="text" id="qty-ciel" class="qty-input" value="0">
+                                                <button class="qty-btn" onclick="changeProductQty('ciel', 1)">+</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card 7: Powerade Frutas Tropicales -->
+                                        <div class="product-card">
+                                            <div class="product-image-container">
+                                                <img src="/static/refrescos/power_frutas.jpeg" alt="Powerade Frutas Tropicales" onerror="handleImageError(this, '⚡')">
+                                            </div>
+                                            <div class="product-title">Powerade Frutas (1L)</div>
+                                            <div class="product-price">$25.00 MXN</div>
+                                            <div class="qty-selector">
+                                                <button class="qty-btn" onclick="changeProductQty('powerade', -1)">-</button>
+                                                <input type="text" id="qty-powerade" class="qty-input" value="0">
+                                                <button class="qty-btn" onclick="changeProductQty('powerade', 1)">+</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card 8: Jugo Del Valle Durazno -->
+                                        <div class="product-card">
+                                            <div class="product-image-container">
+                                                <img src="/static/refrescos/jugo_del_valle_durazno.jpeg" alt="Jugo Del Valle Durazno" onerror="handleImageError(this, '🧃')">
+                                            </div>
+                                            <div class="product-title">Del Valle Durazno (413ml)</div>
+                                            <div class="product-price">$15.00 MXN</div>
+                                            <div class="qty-selector">
+                                                <button class="qty-btn" onclick="changeProductQty('del_valle', -1)">-</button>
+                                                <input type="text" id="qty-del_valle" class="qty-input" value="0">
+                                                <button class="qty-btn" onclick="changeProductQty('del_valle', 1)">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Virtual Assistant Card -->
+                                <div class="card" style="margin: 0;">
+                                    <h3>💬 Chat de Rescate Comercial</h3>
+                                    <p class="card-subtitle">Consulta con nuestro bot inteligente la disponibilidad de tus SKUs de mañana.</p>
+                                    
+                                    <div class="chat-container" style="height: 350px; display: flex; flex-direction: column;">
+                                        <div class="chat-feed" id="chat-feed" style="flex-grow: 1; overflow-y: auto; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); margin-bottom: 15px;">
+                                            <div class="chat-bubble bot">
+                                                Asistente Virtual: ¡Hola! Estoy revisando tu orden programada. ¿Qué producto deseas validar de tu pedido de mañana?
+                                            </div>
+                                        </div>
+                                        
+                                        <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                                            <div style="flex-grow: 1; min-width: 200px;">
+                                                <select id="chat-product-select" class="chat-select" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-weight: 600;">
+                                                    <option value="">-- Elige un producto --</option>
+                                                    <option value="coke">Coca - Cola</option>
+                                                    <option value="sprite">Sprite Lima Limón</option>
+                                                    <option value="fanta">Fanta Uva</option>
+                                                    <option value="ciel">Ciel Agua Purificada</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div id="chat-alert-box" class="chat-alert-box hidden" style="flex-grow: 2; min-width: 300px; margin-top: 15px;">
+                                                <div style="background-color: #FFE6E6; padding: 15px; border-radius: 8px; border-left: 5px solid #E60000; display: flex; flex-direction: column; gap: 12px; text-align: left; width: 100%;">
+                                                    <!-- Banner Visual de Campaña Oficial -->
+                                                    <div style="background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); border: 2px dashed #D97706; padding: 15px; border-radius: 8px; color: #78350F; font-size: 0.88rem; line-height: 1.5; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                                        <strong>🔴 Digitaliza tus Tapitas Físicas aquí 🔴</strong><br>
+                                                        ¿Recibiste taparroscas de tus clientes de la promoción Tus Tapitas Valen? ¡Ya no tienes que guardarlas en una bolsa ni esperar días a que pase el camión repartidor para que te las pague!<br><br>
+                                                        <strong>Cómo funciona nuestra innovación:</strong><br>
+                                                        📲 Escanea o registra aquí las tapas de $2, $5 o $10 pesos que te dejaron tus consumidores.<br>
+                                                        ⚡ Saldo Inmediato: El dinero se abona al instante como un descuento directo en este pedido digital de Arca Continental.<br>
+                                                        💵 ¡Mejora tu flujo de efectivo hoy mismo! Sin filas, sin acumular plástico en tu tiendita y con tu dinero disponible de inmediato.
+                                                    </div>
+                                                    
+                                                    <!-- Mensaje de Empatía -->
+                                                    <div style="background-color: #EFF6FF; border-left: 4px solid #2563EB; padding: 10px 12px; border-radius: 6px; color: #1E3A8A; font-size: 0.85rem; line-height: 1.45; font-weight: 500;">
+                                                        💡 En Arca Continental cuidamos tu negocio. Si tu producto original no está disponible, bloqueamos el precio por litro de tu alternativa sugerida para que jamás pagues de más y protejas tu margen de ganancia.
+                                                    </div>
+                                                    <p id="chat-alert-text" style="color: #111111; margin: 0; font-size: 0.88rem; font-weight: 600; line-height: 1.45;"></p>
+                                                    <p style="color: #111111; margin: 0; font-size: 0.88rem;"><b>⚙️ Algoritmo de Equivalencia de Volumen Activado:</b></p>
+                                                    <ul style="color: #111111; margin: 0 0 0 20px; padding: 0; font-size: 0.88rem; list-style-type: disc;">
+                                                        <li><b>Volumen Solicitado:</b> 12 Litros Totales (en empaque original).</li>
+                                                        <li><b>Sustitución Recomendada:</b> 2 Multi-empaques de 6 piezas de 1.00 L (Misma Categoría: Bebidas Cola).</li>
+                                                        <li><b>Diferencia de Precio:</b> $0.00 MXN (Se respeta tarifa promocional por caja).</li>
+                                                    </ul>
+                                                    <div style="display: flex; justify-content: flex-end; margin-top: 5px;">
+                                                        <button id="btn-accept-substitution" class="btn-primary" style="width: auto; padding: 8px 16px;">Aceptar Sustitución Inteligente</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Right Area: Cart Summary Box -->
+                            <div class="cart-summary-box">
+                                <h3 class="cart-title">🛒 Mi Carrito Digital</h3>
+                                
+                                <div id="cart-items-container" class="cart-items-list">
+                                    <div class="cart-empty-msg">Tu carrito está vacío. Agrega productos más vendidos a tu orden.</div>
+                                </div>
+                                
+                                <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 15px; font-size: 0.95rem;">
+                                    <div style="display: flex; justify-content: space-between; color: var(--text-secondary);">
+                                        <span>Subtotal del Carrito:</span>
+                                        <span id="cart-subtotal" style="font-weight: 600;">$0.00 MXN</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; color: #10B981; font-weight: 700;">
+                                        <span>Descuento por Tapitas:</span>
+                                        <span id="cart-tapitas-discount">-$0.00 MXN</span>
+                                    </div>
+                                    <div id="cart-sub-discount-row" class="hidden" style="display: flex; justify-content: space-between; color: #2563EB; font-weight: 700;">
+                                        <span>Descuento por Sustitución:</span>
+                                        <span>-$10.00 MXN</span>
+                                    </div>
+                                    <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 5px 0;">
+                                    <div style="display: flex; justify-content: space-between; font-size: 1.15rem; font-weight: 800; color: var(--text-primary);">
+                                        <span>Total Neto a Pagar:</span>
+                                        <span id="cart-total" style="color: #E60000;">$0.00 MXN</span>
+                                    </div>
+                                </div>
+                                
+                                <button id="btn-submit-order" class="btn-primary" style="width: 100%; padding: 15px; font-size: 1.05rem; border-radius: 12px; margin-top: 10px; font-weight: 700; box-shadow: 0 4px 15px rgba(230,0,0,0.25);" onclick="confirmAndSubmitOrder()">
+                                    🛒 Confirmar y Enviar Pedido al CEDI
+                                </button>
+                        </div>
+                    </div>
+                </div>
+
+                    <!-- Tab 2: Merma tickets -->
+                    <div id="m-tab-incidencias" class="mobile-tab-pane">
+                        <div class="card" style="max-width: 600px; margin: 0 auto;">
+                            <h3>📦 Buzón de Incidencias Express</h3>
+                            <p class="card-subtitle">Reporta mermas o productos dañados del camión repartidor.</p>
+                            
+
+
+                            <form id="form-incidence" onsubmit="submitIncidence(event)">
+                                <div class="form-group">
+                                    <label for="inc-product">Producto Dañado o Mermas:</label>
+                                    <select id="inc-product" class="form-control" style="padding: 10px;" required>
+                                        <option value="Coca - Cola">Coca - Cola</option>
+                                        <option value="Sprite Lima Limón">Sprite Lima Limón</option>
+                                        <option value="Fanta Uva">Fanta Uva</option>
+                                        <option value="Ciel Agua Purificada">Ciel Agua Purificada</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inc-comments">Comentarios o detalles:</label>
+                                    <textarea id="inc-comments" class="form-control" rows="4" placeholder="Ej. El empaque llegó roto / botellas abolladas..." style="padding: 10px;" required></textarea>
+                                </div>
+                                <div class="form-group">
+                                     <label>Tomar foto de la merma (Evidencia):</label>
+                                     <input type="file" id="inc-photo" class="form-file-input" accept="image/*">
+                                     <div id="inc-photo-preview-container" style="margin-top: 12px; display: none; text-align: center;">
+                                         <img id="inc-photo-preview" src="" alt="Evidencia de merma" style="max-width: 300px; width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+                                         <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Evidencia cargada por el Tendero</p>
+                                     </div>
+                                 </div>
+                                 <button type="submit" class="btn-primary btn-block" style="padding: 12px; font-size: 0.95rem;">Enviar Reporte a Control de Calidad</button>
+                            </form>
+
+                            <!-- Success Banner (Streamlit st.success clone) -->
+                            <div id="inc-success-box" class="hidden" style="background-color: #D4EDDA; padding: 16px; border-radius: 12px; border-left: 5px solid #28A745; margin-top: 20px; box-shadow: var(--shadow-sm);">
+                                <p id="inc-success-text" style="color: #155724; margin: 0; font-size: 0.88rem; line-height: 1.5; font-weight: 600;"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Rewards catalog -->
+                    <div id="m-tab-premios" class="mobile-tab-pane">
+                        <div class="card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; gap: 15px;">
+                                <div>
+                                    <h3 style="margin: 0;">🎁 Club de Premios y Recompensas Coleccionables</h3>
+                                    <p class="card-subtitle" style="margin: 4px 0 0 0;">Canjea tus Puntos Rescate por coleccionables retro oficiales de Coca-Cola.</p>
+                                </div>
+                                <div id="premios-urgency-banner" style="background-color: #FFE6E6; border-left: 4px solid #E60000; padding: 10px 16px; border-radius: 8px; font-weight: 700; color: #E60000; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-sm); border: 1px solid transparent;">
+                                    ⏳ ¡Atención: Tus retos y puntos acumulados de este ciclo expiran en <span class="live-countdown" style="font-family: monospace; font-weight: 800;">48:00:00</span>!
+                                </div>
+                            </div>
+                            
+                            <div class="rewards-grid-desktop" id="rewards-grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                                <!-- Dynamically populated from JS based on season -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 4: Fichitas / Tapitas digital campaign -->
+                    <div id="m-tab-fichitas" class="mobile-tab-pane">
+                        <style>
+                            @keyframes scanLine {
+                                0% { top: 0%; }
+                                50% { top: 100%; }
+                                100% { top: 0%; }
+                            }
+                        </style>
+                        <div class="card" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+                            
+                            <!-- Campaign Banner -->
+                            <div style="background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); border: 2px dashed #D97706; padding: 25px; border-radius: 12px; color: #78350F; font-size: 0.95rem; line-height: 1.6; font-weight: 600; box-shadow: var(--shadow-sm); position: relative;">
+                                <span style="font-size: 3rem; display: block; margin-bottom: 10px; text-align: center;">🔴</span>
+                                <h3 style="color: #D97706; font-size: 1.4rem; margin-bottom: 15px; font-weight: 900; text-align: center;">🔴 Digitaliza tus Tapitas Físicas aquí 🔴</h3>
+                                <p style="margin: 0 0 15px 0; color: #78350F; font-weight: 700; font-size: 1.05rem;">¿Recibiste taparroscas de tus clientes de la promoción Tus Tapitas Valen? ¡Ya no tienes que guardarlas en una bolsa ni esperar días a que pase el camión repartidor para que te las pague!</p>
+                                
+                                <p style="margin-bottom: 5px; font-weight: 800; text-decoration: underline;">Cómo funciona nuestra innovación:</p>
+                                <ul style="list-style-type: none; padding: 0; margin: 0 0 20px 0; display: flex; flex-direction: column; gap: 10px;">
+                                    <li>📲 <strong>Escanea o registra</strong> aquí las tapas de $2, $5 o $10 pesos que te dejaron tus consumidores.</li>
+                                    <li>⚡ <strong>Saldo Inmediato:</strong> El dinero se abona al instante como un descuento directo en este pedido digital de Arca Continental.</li>
+                                    <li>💵 <strong>¡Mejora tu flujo de efectivo hoy mismo!</strong> Sin filas, sin acumular plástico en tu tiendita y con tu dinero disponible de inmediato.</li>
+                                </ul>
+
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; background: rgba(255,255,255,0.6); padding: 20px; border-radius: 10px; border: 1px solid rgba(217,119,6,0.2);">
+                                    <button id="btn-scan-tapitas" class="btn-primary" style="padding: 14px 28px; font-size: 1.1rem; border-radius: 12px; background: linear-gradient(135deg, #D97706 0%, #B45309 100%); border: none; box-shadow: 0 4px 15px rgba(217,119,6,0.3); font-weight: 700; cursor: pointer; transition: all 0.2s;" onclick="simulateTapitasScan()">
+                                        📸 Escanear Tapitas Recibidas
+                                    </button>
+                                    <div id="scan-animation-container" class="hidden" style="width: 100%; max-width: 250px; height: 140px; border: 2px solid #D97706; border-radius: 8px; position: relative; overflow: hidden; background-color: #000; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 0.8rem; font-weight: bold;">
+                                        <div style="width: 100%; height: 2px; background-color: #10B981; position: absolute; left: 0; top: 0; animation: scanLine 1.5s infinite linear; box-shadow: 0 0 8px #10B981;"></div>
+                                        <span>🔍 Activando Cámara...</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cart Summary Card -->
+                            <div style="background-color: #F8FAFC; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; box-shadow: var(--shadow-sm);">
+                                <h4 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; color: var(--text-primary);">
+                                    🛒 Resumen de tu Pedido Programado (ID: <span id="tapitas-pedido-id">...</span>)
+                                </h4>
+                                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.95rem;">
+                                    <div style="display: flex; justify-content: space-between; color: var(--text-secondary);">
+                                        <span>Total del Pedido Original:</span>
+                                        <span style="font-weight: 600;" id="tapitas-original-total">$2,450.00 MXN</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; color: #10B981; font-weight: 700;">
+                                        <span>Descuento por Tapitas Digitalizadas:</span>
+                                        <span id="tapitas-scanned-discount">-$0.00 MXN</span>
+                                    </div>
+                                    <div id="tapitas-sub-discount-row" class="hidden" style="display: flex; justify-content: space-between; color: #2563EB; font-weight: 700;">
+                                        <span>Bono Compensación por Desabasto (Sustitución):</span>
+                                        <span>-$10.00 MXN</span>
+                                    </div>
+                                    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 5px 0;">
+                                    <div style="display: flex; justify-content: space-between; font-size: 1.15rem; font-weight: 800; color: var(--text-primary);">
+                                        <span>Total Final Neto a Cobrar:</span>
+                                        <span style="color: #E60000; font-size: 1.25rem;" id="tapitas-final-total">$2,450.00 MXN</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Active Wallet -->
+                            <div>
+                                <h4 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; color: var(--text-primary);">
+                                    🪙 Mi Monedero de Fichitas Digitales (Acumulado)
+                                </h4>
+                                <div id="fichitas-wallet-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
+                                    <!-- Dynamically populated from JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 5: Soporte y Legal -->
+                    <div id="m-tab-soporte" class="mobile-tab-pane">
+                        <div class="card" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+                            <h3 style="margin-bottom: 5px;">💬 Soporte y Legal</h3>
+                            <p class="card-subtitle" style="margin-bottom: 20px;">Preguntas frecuentes del portal y términos legales simplificados de ArcaSin.</p>
+
+                            <!-- Accordion FAQ -->
+                            <div class="faq-section" style="display: flex; flex-direction: column; gap: 15px;">
+                                <h4 style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">❓ Preguntas Frecuentes (FAQ)</h4>
+                                
+                                <details class="faq-details" style="border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: white; padding: 15px; box-shadow: var(--shadow-sm); cursor: pointer; transition: border-color 0.2s; outline: none;">
+                                    <summary style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center; outline: none; user-select: none;">
+                                        <span>💡 ¿Cómo gano los Puntos Rescate por desabasto?</span>
+                                        <span style="font-size: 0.8rem; color: var(--text-secondary);">▼</span>
+                                    </summary>
+                                    <p style="margin-top: 10px; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; cursor: default;">
+                                        Si un producto de tu carrito no tiene stock en el CEDI, nuestro asistente te sugerirá un sustituto ideal. Al aceptar la sugerencia dentro del tiempo del contador express, te regalamos +50 puntos directo a tu cuenta.
+                                    </p>
+                                </details>
+
+                                <details class="faq-details" style="border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: white; padding: 15px; box-shadow: var(--shadow-sm); cursor: pointer; transition: border-color 0.2s; outline: none;">
+                                    <summary style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center; outline: none; user-select: none;">
+                                        <span>⏳ ¿Cuándo vencen mis puntos o retos?</span>
+                                        <span style="font-size: 0.8rem; color: var(--text-secondary);">▼</span>
+                                    </summary>
+                                    <p style="margin-top: 10px; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; cursor: default;">
+                                        Los puntos acumulados del mes no vencen, pero los Retos Express tienen un contador en vivo de 15 minutos (para efectos de demostración). ¡Acepta la sustitución antes de que llegue a cero para no perder el bono!
+                                    </p>
+                                </details>
+
+                                <details class="faq-details" style="border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: white; padding: 15px; box-shadow: var(--shadow-sm); cursor: pointer; transition: border-color 0.2s; outline: none;">
+                                    <summary style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center; outline: none; user-select: none;">
+                                        <span>💰 ¿Cómo cobro el dinero de las Tapitas Digitales?</span>
+                                        <span style="font-size: 0.8rem; color: var(--text-secondary);">▼</span>
+                                    </summary>
+                                    <p style="margin-top: 10px; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; cursor: default;">
+                                        Solo debes escanear las tapas físicas que te dejen tus clientes en el botón de la app. El saldo ($2, $5 o $10) se descontará inmediatamente del total de tu pedido actual.
+                                    </p>
+                                </details>
+                            </div>
+
+                            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
+
+                            <!-- Accordion Legal -->
+                            <div class="legal-section" style="display: flex; flex-direction: column; gap: 15px;">
+                                <h4 style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">📜 Términos y Condiciones</h4>
+                                
+                                <details class="faq-details" style="border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: white; padding: 15px; box-shadow: var(--shadow-sm); cursor: pointer; transition: border-color 0.2s; outline: none;">
+                                    <summary style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center; outline: none; user-select: none;">
+                                        <span>🔒 Aviso Legal y Condiciones Generales</span>
+                                        <span style="font-size: 0.8rem; color: var(--text-secondary);">▼</span>
+                                    </summary>
+                                    <p style="margin-top: 10px; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; cursor: default;">
+                                        Programa de Lealtad B2B operado por Arca Continental. Los premios del catálogo están sujetos a disponibilidad de inventario por zona de reparto. Las sustituciones de producto respetan el precio por litro del producto original únicamente durante la vigencia de la alerta actual. Los saldos abonados por la campaña "Tus Tapitas Valen Digital" no son canjeables por dinero en efectivo, únicamente son válidos como saldo a favor para compras dentro de esta plataforma.
+                                    </p>
+                                </details>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 6: Diagnóstico de Surtido -->
+                    <div id="m-tab-diagnostico" class="mobile-tab-pane">
+                        <div class="card" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+                            <h3 style="margin-bottom: 5px;">📊 Diagnóstico de Surtido (Datos e Inteligencia)</h3>
+                            <p class="card-subtitle" style="margin-bottom: 20px;">Diagnóstico analítico y perfiles de demanda para optimización de inventario.</p>
+                            
+                            <h4>🕒 Momento de Recurrencia (Horas Pico)</h4>
+                            <div style="background-color: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center; margin-bottom: 15px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-end; height: 160px; padding: 10px 0; max-width: 500px; margin: 0 auto; gap: 8px;">
+                                    <div style="display: flex; flex-direction: column; align-items: center; flex: 1;"><div style="height: 10%; width: 100%; background: linear-gradient(180deg, #FEB2B2, #E60000); border-radius: 4px 4px 0 0;"></div><span style="font-size: 0.7rem; margin-top: 6px; color: var(--text-secondary);">06h</span></div>
+                                    <div style="display: flex; flex-direction: column; align-items: center; flex: 1;"><div style="height: 15%; width: 100%; background: linear-gradient(180deg, #FEB2B2, #E60000); border-radius: 4px 4px 0 0;"></div><span style="font-size: 0.7rem; margin-top: 6px; color: var(--text-secondary);">08h</span></div>
+                                    <div style="display: flex; flex-direction: column; align-items: center; flex: 1;"><div style="height: 35%; width: 100%; background: linear-gradient(180deg, #FEB2B2, #E60000); border-radius: 4px 4px 0 0;"></div><span style="font-size: 0.7rem; margin-top: 6px; color: var(--text-secondary);">10h</span></div>
+                                    <div style="display: flex; flex-direction: column; align-items: center; flex: 1;"><div style="height: 75%; width: 100%; background: linear-gradient(180deg, #EF4444, #B91C1C); border-radius: 4px 4px 0 0; box-shadow: 0 0 10px rgba(230,0,0,0.3);"></div><span style="font-size: 0.7rem; margin-top: 6px; color: #E60000; font-weight: 800;">12h</span></div>
+                                    <div style="display: flex; flex-direction: column; align-items: center; flex: 1;"><div style="height: 85%; width: 100%; background: linear-gradient(180deg, #EF4444, #B91C1C); border-radius: 4px 4px 0 0; box-shadow: 0 0 10px rgba(230,0,0,0.3);"></div><span style="font-size: 0.7rem; margin-top: 6px; color: #E60000; font-weight: 800;">14h</span></div>
+                                    <div style="display: flex; flex-direction: column; align-items: center; flex: 1;"><div style="height: 40%; width: 100%; background: linear-gradient(180deg, #FEB2B2, #E60000); border-radius: 4px 4px 0 0;"></div><span style="font-size: 0.7rem; margin-top: 6px; color: var(--text-secondary);">16h</span></div>
+                                    <div style="display: flex; flex-direction: column; align-items: center; flex: 1;"><div style="height: 25%; width: 100%; background: linear-gradient(180deg, #FEB2B2, #E60000); border-radius: 4px 4px 0 0;"></div><span style="font-size: 0.7rem; margin-top: 6px; color: var(--text-secondary);">18h</span></div>
+                                    <div style="display: flex; flex-direction: column; align-items: center; flex: 1;"><div style="height: 10%; width: 100%; background: linear-gradient(180deg, #FEB2B2, #E60000); border-radius: 4px 4px 0 0;"></div><span style="font-size: 0.7rem; margin-top: 6px; color: var(--text-secondary);">20h</span></div>
+                                </div>
+                                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 12px; font-weight: 600;">Probabilidad de Desabasto por Hora del Día (%)</p>
+                            </div>
+                            <div style="background-color: #FFF9E6; border-left: 4px solid #F59E0B; padding: 15px; border-radius: 8px; color: #78350F; font-size: 0.9rem; font-weight: 600; line-height: 1.45;">
+                                💡 <strong>Alerta de Horas Pico:</strong> Detectamos que el 65% de los quiebres de stock ocurren al mediodía. Tu pedido actual se está generando en una ventana segura.
+                            </div>
+                            
+                            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 10px 0;">
+                            
+                            <h4>🏆 Productos con Mayor Sustitución</h4>
+                            <p class="card-subtitle" style="margin-top: -10px;">Top 3 de productos que más faltan en el CEDI y su sustituto ideal pre-calculado:</p>
+                            <ul style="list-style-type: none; padding: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.95rem;">
+                                <li style="display: flex; align-items: center; gap: 10px; background-color: white; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                    <span>🥤 <strong>Coca-Cola Original 600ml</strong> ➡️ Sustituto: Coca-Cola Sin Azúcar</span>
+                                    <span class="badge-status green" style="margin-left: auto; background-color: #D4EDDA; color: #155724; padding: 4px 8px; border-radius: 4px; font-weight: 700; font-size: 0.8rem;">Aceptación: 84%</span>
+                                </li>
+                                <li style="display: flex; align-items: center; gap: 10px; background-color: white; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                    <span>🍊 <strong>Fanta Naranja 600ml</strong> ➡️ Sustituto: Fanta Uva</span>
+                                    <span class="badge-status yellow" style="margin-left: auto; background-color: #FFF3CD; color: #856404; padding: 4px 8px; border-radius: 4px; font-weight: 700; font-size: 0.8rem;">Aceptación: 71%</span>
+                                </li>
+                                <li style="display: flex; align-items: center; gap: 10px; background-color: white; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                    <span>🍋 <strong>Sprite Limón 600ml</strong> ➡️ Sustituto: Agua Ciel Saborizada</span>
+                                    <span class="badge-status yellow" style="margin-left: auto; background-color: #FFF3CD; color: #856404; padding: 4px 8px; border-radius: 4px; font-weight: 700; font-size: 0.8rem;">Aceptación: 65%</span>
+                                </li>
+                            </ul>
+                            
+                            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 10px 0;">
+                            
+                            <h4>🎯 Segmento de Cliente y Demanda</h4>
+                            <div style="background-color: #EFF6FF; border-left: 4px solid #2563EB; padding: 15px; border-radius: 8px; color: #1E3A8A; font-size: 0.9rem; font-weight: 600; line-height: 1.45;">
+                                🎯 <strong>Segmento Asignado:</strong> Tienda de Alta Rotación Escolar. Este perfil de cliente es altamente sensible a la falta de refresco de sabor al mediodía. La app prioriza las alertas express de Fanta y Sprite para proteger sus ventas del día.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ================ ROLE 2: OPERADOR CEDI / RUTA ================ -->
+            <section id="view-operator" class="role-view hidden">
+                <header class="view-header">
+                    <h2>Tablero Operativo de Distribución</h2>
+                    <p>Logística de picking en almacén y entrega física del transportista</p>
+                </header>
+
+                <div class="workspace-tabs">
+                    <button class="op-tab-btn active" onclick="switchOperatorTab('picking')">🏭 Almacén (Picking CEDI)</button>
+                    <button class="op-tab-btn" onclick="switchOperatorTab('ruta')">🚚 Ruta de Reparto</button>
+                </div>
+
+                <div class="operator-tab-content">
+                    
+                    <!-- Operator Tab 1: Warehouse Picking -->
+                    <div id="op-tab-picking" class="op-tab-pane active">
+                        <div id="picking-alert-container">
+                            <!-- Banner dynamic populated from JS based on Aceptaciones.csv -->
+                        </div>
+                        
+                        <div class="logistics-board card">
+                            <h3>📋 Bitácora General de Cargas (CEDI 3804)</h3>
+                            <div class="table-wrapper">
+                                <table class="table-clean">
+                                    <thead>
+                                        <tr>
+                                            <th>Pedido ID</th>
+                                            <th>Cliente</th>
+                                            <th>SKU Solicitado</th>
+                                            <th>Cantidad</th>
+                                            <th>Sustitución Inteligente</th>
+                                            <th>Estado de Carga</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>8927240000000000000</strong></td>
+                                            <td>Abarrotes Don Pepe</td>
+                                            <td>Coca - Cola 2L</td>
+                                            <td>98 uds</td>
+                                            <td><span id="picking-sub-badge" class="badge-status yellow">En Espera</span></td>
+                                            <td><span id="picking-status-badge" class="badge-status yellow">Retenido</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>8927240000000000002</td>
+                                            <td>Mini Super Lupita</td>
+                                            <td>Coca - Cola Zero</td>
+                                            <td>50 uds</td>
+                                            <td><span class="badge-status gray">No Requiere</span></td>
+                                            <td><span class="badge-status green">Listo</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>8927240000000000003</td>
+                                            <td>Miscelánea El Güero</td>
+                                            <td>Sprite Lima Limón</td>
+                                            <td>30 uds</td>
+                                            <td><span class="badge-status gray">No Requiere</span></td>
+                                            <td><span class="badge-status green">Listo</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Operator Tab 2: Delivery route -->
+                    <div id="op-tab-ruta" class="op-tab-pane">
+                        <div class="route-layout-grid">
+                            
+                            <!-- Delivery Checklist -->
+                            <div class="card">
+                                <h3>📋 Hoja de Ruta Repartidor</h3>
+                                <p class="card-subtitle">Valida el estado físico de la mercadería al entregar.</p>
+                                
+                                <div class="checklist-container">
+                                    <div class="checklist-item">
+                                        <div class="chk-info">
+                                            <span class="chk-title">Abarrotes Don Pepe</span>
+                                            <span class="chk-desc">Monto: $2,450.00 | Detalle: 2 Packs 1.5L Coca-Cola</span>
+                                        </div>
+                                        <input type="checkbox" id="chk-pepe" class="chk-box">
+                                    </div>
+                                    
+                                    <div class="checklist-item">
+                                        <div class="chk-info">
+                                            <span class="chk-title">Mini Super Lupita</span>
+                                            <span class="chk-desc">Monto: $14,500.00 | Detalle: Carga completa regular</span>
+                                        </div>
+                                        <input type="checkbox" id="chk-lupita" class="chk-box">
+                                    </div>
+                                    
+                                    <div class="checklist-item">
+                                        <div class="chk-info">
+                                            <span class="chk-title">Miscelánea El Güero</span>
+                                            <span class="chk-desc">Monto: $8,200.00 | Detalle: Carga completa regular</span>
+                                        </div>
+                                        <input type="checkbox" id="chk-guero" class="chk-box">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Historical complaints -->
+                            <div class="card">
+                                <h3>⚠️ Historial de Quejas a Resolver</h3>
+                                <p class="card-subtitle">Alertas previas registradas en base del cliente.</p>
+                                
+                                <div class="complaints-timeline">
+                                    <div class="complaint-card warning">
+                                        <div class="comp-header">
+                                            <strong>Abarrotes Don Pepe</strong>
+                                            <span class="badge-status yellow">Ruta 104-A</span>
+                                        </div>
+                                        <p class="comp-text">Reportó 1 botella dañada de 2L el 05/06/2026.</p>
+                                        <span class="comp-instruction">💡 <strong>Instrucción Repartidor:</strong> Entregar bonificación física (1 unidad cortesía) en esta visita.</span>
+                                    </div>
+                                    
+                                    <div class="complaint-card normal">
+                                        <div class="comp-header">
+                                            <strong>Mini Super Lupita</strong>
+                                            <span class="badge-status gray">Ruta 104-A</span>
+                                        </div>
+                                        <p class="comp-text">Sin incidencias de mermas o quejas pendientes en la base.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ================ ROLE 3: ADMINISTRADOR (PC DASHBOARD) ================ -->
+            <section id="view-admin" class="role-view hidden">
+                <header class="view-header">
+                    <h2>Tablero de Control de Resiliencia Comercial</h2>
+                    <p>Monitoreo en tiempo real para Jueces de Arca Continental</p>
+                </header>
+
+                <!-- Metric Cards -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span class="metric-title">GMV Rescatado (Proyección)</span>
+                        <h2 class="metric-value" id="metric-gmv">$0.00 MXN</h2>
+                        <span class="metric-sub text-green">↑ Base Total de Pedidos: $142.7M MXN</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Tasa de Órdenes Salvadas</span>
+                        <h2 class="metric-value" id="metric-saved-rate">0.00%</h2>
+                        <span class="metric-sub text-gray">Sustituciones inteligentes aprobadas</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Quejas Express Resueltas</span>
+                        <h2 class="metric-value" id="metric-complaints">0</h2>
+                        <span class="metric-sub text-green">✓ Tiempo medio respuesta: 14 min</span>
+                    </div>
+                </div>
+
+                <!-- Graphs Grid -->
+                <div class="charts-grid">
+                    <div class="chart-card card">
+                        <h3>📊 Top 5 SKUs con Más Casos de Desabasto</h3>
+                        <p class="card-subtitle">Volumen total de incidentes reportados en Resultados.csv</p>
+                        <div class="chart-canvas-container">
+                            <canvas id="chart-sku"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card card">
+                        <h3>🚨 Hotspots Logísticos: Alertas por CEDIS</h3>
+                        <p class="card-subtitle">Zonas rojas logísticas (CEDIS 3804, 3810 y 3501)</p>
+                        <div class="chart-canvas-container">
+                            <canvas id="chart-cedis"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live incidents feed -->
+                <div class="card live-incidents-card">
+                    <h3>📜 Buzón Express: Incidencias Registradas en Vivo (Incidencias.csv)</h3>
+                    <p class="card-subtitle">Mermas y faltantes reportados en tiempo real por los clientes.</p>
+                    
+                    <div class="table-wrapper">
+                        <table class="table-clean" id="table-incidencias">
+                            <thead>
+                                <tr>
+                                    <th>Folio</th>
+                                    <th>Producto</th>
+                                    <th>Comentarios</th>
+                                    <th>Foto Adjunta</th>
+                                    <th>Fecha Reporte</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="incidencias-rows-container">
+                                <!-- Populated from JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="incidencias-empty-state" class="empty-state">
+                        <p>No se han registrado incidencias físicas en este turno.</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Custom JS -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
