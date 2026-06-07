@@ -66,5 +66,5 @@ These metrics demonstrated that store owners are highly receptive to adapting th
 
 ##Images
 
-![Login de ArcaSin]("login.png")
+![Login de ArcaSin](login.png)
 
