@@ -1,7 +1,7 @@
 username,password,role
 admin,admin123,admin
 operador,operador123,operator
-8927240000000,123456,tendero
+8927240000000,12345678,tendero
 8429210000000000000,cliente123,tendero
 3037320000000000000,cliente123,tendero
 3649870000000000000,cliente123,tendero
@@ -56400,3 +56400,4 @@ operador,operador123,operator
 3799420000000000000,cliente123,tendero
 390934000000000000,cliente123,tendero
 9002320000000000000,cliente123,tendero
+8927200000000,123456,tendero

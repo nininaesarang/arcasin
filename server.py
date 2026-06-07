@@ -7,12 +7,25 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-# SMTP Settings for Email Recovery (Configure environment variables for real email sending)
-SMTP_SERVER = os.environ.get('SMTP_SERVER', 'smtp.gmail.com')
+# Try to load local .env file manually if it exists
+if os.path.exists('.env'):
+    try:
+        with open('.env', 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, val = line.split('=', 1)
+                    os.environ[key.strip()] = val.strip().strip('"').strip("'")
+    except Exception as e:
+        print(f"Error loading .env file: {e}")
+
+# SMTP Settings for Email Recovery (Configure environment variables or .env file for real email sending)
+SMTP_SERVER = os.environ.get('SMTP_SERVER', 'smtp.office365.com')
 SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
-SMTP_USER = os.environ.get('SMTP_USER', '')  # e.g., 'your_email@gmail.com'
-SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')  # Gmail App Password
+SMTP_USER = os.environ.get('SMTP_USER', 'martinez_maryjose@uadec.edu.mx')
+SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', 'Kimseo@115')
 SMTP_SENDER = os.environ.get('SMTP_SENDER', SMTP_USER)
+
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
@@ -382,8 +395,8 @@ def api_send_recovery_email():
         """
         msg.attach(MIMEText(body_html, 'html'))
         
-        # Connect and send
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        # Connect and send with a 5-second timeout to prevent freezing
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=5)
         server.starttls()
         server.login(SMTP_USER, SMTP_PASSWORD)
         server.sendmail(SMTP_SENDER, email, msg.as_string())
